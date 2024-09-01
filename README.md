@@ -16,6 +16,7 @@
 2. Creation of 3D beam
 3. Creation of rebars
 4. Setting up proper scaling parameters for ease of use
+5. ![alt text](image.png)
 
 ## To Do List
 
