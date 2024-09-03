@@ -20,9 +20,10 @@
 
 ## To Do List
 
+- [x] Setting up visualization of ties.
+- [ ] Add 90deg bends to the corners.
 - [ ] setting up a controller to control the beam dimensions
 - [ ] setting up visualization of Neutral axis
-- [ ] Setting up visualization of ties
 - [ ] setting up the loading part
 - [ ] setting up the calculation part of reinforcement
 - [ ] will write more when needed

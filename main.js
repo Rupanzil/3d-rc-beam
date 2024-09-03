@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import makeGrid from './components/makeGrid'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import makeTies from './components/makeTies'
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ---------------------------------------GLOBAL CONTROLS----------------------------------
@@ -9,6 +10,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 let sceneBackgroundColor = 0xe6fffa
 let scale = 1 / 100 // This means that 1 unit of Three js means 100mm
 // we will use a unit of mm throughout the project.
+let clearCover = 50 * scale
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ---------------------------------------SCENE CONTROLS------------------------------------
@@ -148,6 +150,14 @@ rebar2.position.y = -(2.5 - 0.5)
 rebar2.position.x = 1
 scene.add(rebar2)
 
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//--------------------------------------------TIES ------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const ties = makeTies(scaledBeamHeight, scaledBeamwidth, clearCover)
+scene.add(ties)
+console.log(ties)
+
 function animate() {
   //   cube.rotation.x += 0.01
   //   cube.rotation.z += 0.01
@@ -163,3 +173,5 @@ function animate() {
 
   renderer.render(scene, camera)
 }
+
+export { scale }
