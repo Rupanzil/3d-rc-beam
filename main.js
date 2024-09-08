@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import makeGrid from './components/makeGrid'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import makeTies from './components/makeTies'
+import { Pane } from 'tweakpane'
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ---------------------------------------GLOBAL CONTROLS----------------------------------
@@ -11,6 +12,7 @@ let sceneBackgroundColor = 0xe6fffa
 let scale = 1 / 100 // This means that 1 unit of Three js means 100mm
 // we will use a unit of mm throughout the project.
 let clearCover = 50 * scale
+let [beamLength, beamWidth, beamHeight] = [700, 300, 750]
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ---------------------------------------SCENE CONTROLS------------------------------------
@@ -26,9 +28,9 @@ const camera = new THREE.PerspectiveCamera(
   1000
 )
 
-camera.position.x = 3.45
-camera.position.y = 3.75
-camera.position.z = 10
+camera.position.x = 5
+camera.position.y = 7.5
+camera.position.z = 18
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -65,7 +67,7 @@ const size = 50
 const divisions = 25
 const gridHelper = makeGrid(size, divisions)
 gridHelper.position.y = -2.5
-scene.add(gridHelper)
+// scene.add(gridHelper)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //---------------------------------------BOX GEOMETRY----------------------------------------
@@ -75,7 +77,6 @@ scene.add(gridHelper)
 // add controller to select the dia of the bar
 // Creating shear reinforcement bar
 
-let [beamLength, beamWidth, beamHeight] = [825, 250, 500]
 let beamColor = 0x666666
 
 let [scaledBeamLength, scaledBeamwidth, scaledBeamHeight] = [
@@ -113,8 +114,101 @@ line.position.y = 0
 scene.add(line)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//---------------------------------------GUI-----------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const PARAMS = {
+  bgColor: '#e6fffa',
+  cameraZ: 18,
+  beamColor: '#666666',
+  wireframe: false,
+  beamLength: 1000,
+  beamHeight: 500,
+  beamWidth: 250,
+}
+
+function updateBeamGeometry() {
+  const scaledLength = PARAMS.beamLength * scale
+  const scaledWidth = PARAMS.beamWidth * scale
+  const scaledHeight = PARAMS.beamHeight * scale
+
+  // Update cube geometry
+  cube.geometry.dispose() // Dispose of old geometry
+  cube.geometry = new THREE.BoxGeometry(scaledWidth, scaledHeight, scaledLength)
+
+  // Update edges
+  const newEdges = new THREE.EdgesGeometry(cube.geometry)
+  line.geometry.dispose() // Dispose of old edge geometry
+  line.geometry = newEdges
+
+  // Update rebar positions
+  const halfLength = scaledLength / 2
+  rebar.position.z = 0
+  rebar.scale.y = scaledLength / (beamLength * scale)
+  rebar1.position.z = 0
+  rebar1.scale.y = scaledLength / (beamLength * scale)
+  rebar2.position.z = 0
+  rebar2.scale.y = scaledLength / (beamLength * scale)
+}
+
+const pane = new Pane()
+
+pane.addBinding(PARAMS, 'bgColor').on('change', (event) => {
+  scene.background = new THREE.Color(event.value)
+})
+
+pane
+  .addBinding(PARAMS, 'cameraZ', {
+    min: 10,
+    max: 30,
+    step: 0.1,
+  })
+  .on('change', (event) => {
+    camera.position.z = event.value
+  })
+
+pane.addBinding(PARAMS, 'beamColor').on('change', (event) => {
+  material.color.setStyle(event.value)
+})
+
+pane.addBinding(PARAMS, 'wireframe').on('change', (event) => {
+  material.wireframe = event.value
+})
+
+pane
+  .addBinding(PARAMS, 'beamLength', {
+    min: 500,
+    max: 5000,
+    step: 10,
+  })
+  .on('change', () => {
+    updateBeamGeometry()
+  })
+
+pane
+  .addBinding(PARAMS, 'beamWidth', {
+    min: 100,
+    max: 1500,
+    step: 10,
+  })
+  .on('change', () => {
+    updateBeamGeometry()
+  })
+
+pane
+  .addBinding(PARAMS, 'beamHeight', {
+    min: 100,
+    max: 1500,
+    step: 10,
+  })
+  .on('change', () => {
+    updateBeamGeometry()
+  })
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //---------------------------------------CYLINDER GEOMETRY-----------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 let rebarExtrusion = 15
 let scaledCylinderLength = (beamLength + rebarExtrusion) * scale
 const rebarGeometry = new THREE.CylinderGeometry(
@@ -154,9 +248,13 @@ scene.add(rebar2)
 //--------------------------------------------TIES ------------------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-const ties = makeTies(scaledBeamHeight, scaledBeamwidth, clearCover)
-scene.add(ties)
-console.log(ties)
+// const ties = makeTies(scaledBeamHeight, scaledBeamwidth, clearCover)
+// scene.add(ties)
+// console.log(ties)
+
+//++++++++++++++++++++++++++
+//--------------------------
+//++++++++++++++++++++++++++
 
 function animate() {
   //   cube.rotation.x += 0.01
@@ -173,5 +271,15 @@ function animate() {
 
   renderer.render(scene, camera)
 }
+
+window.addEventListener('resize', onWindowResize, false)
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+}
+
+animate()
 
 export { scale }
