@@ -85,10 +85,10 @@ const material = new THREE.MeshPhongMaterial({
   transparent: true,
 })
 
-const beamCreator = new BeamCreator(scene, material)
+const beam = new BeamCreator(scene, material)
 
 // initial beam creation
-beamCreator.createBeam(700, 250, 500)
+beam.createBeam(700, 250, 500)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //---------------------------------------TWEAKPANE----------------------------------------
@@ -99,7 +99,7 @@ const PARAMS = setupTweakpane(
   camera,
   material,
   (newLength, newWidth, newHeight) =>
-    beamCreator.updateBeamGeometry(newLength, newWidth, newHeight)
+    beam.updateBeamGeometry(newLength, newWidth, newHeight)
 )
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -151,16 +151,6 @@ const PARAMS = setupTweakpane(
 //++++++++++++++++++++++++++
 
 function animate() {
-  //   cube.rotation.x += 0.01
-  //   cube.rotation.z += 0.01
-
-  //   line.rotation.x += 0.01
-  //   line.rotation.z += 0.01
-  //   const time = -performance.now() * 0.0003
-
-  //   camera.position.x = 10 * Math.cos(time)
-  //   camera.position.z = 10 * Math.sin(time)
-
   camera.lookAt(scene.position)
 
   renderer.render(scene, camera)

@@ -32,6 +32,7 @@ export class BeamCreator {
     }
 
     this.cube.position.y = scaledHeight / 2
+    console.log(length, width, height)
 
     // edges
     const edges = new THREE.EdgesGeometry(geometry)
