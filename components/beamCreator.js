@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import limitingDepthNA from './rebarCalculations'
+import { depth } from 'three/webgpu'
 
 export class BeamCreator {
   constructor(scene, material, scale = 1 / 100) {
@@ -34,6 +36,8 @@ export class BeamCreator {
     this.cube.position.y = scaledHeight / 2
     console.log(length, width, height)
 
+    const limNAdepth = limitingDepthNA(width, height)
+
     // edges
     const edges = new THREE.EdgesGeometry(geometry)
     if (this.line) {
@@ -48,6 +52,8 @@ export class BeamCreator {
     }
 
     this.line.position.y = scaledHeight / 2
+
+    // updating the limiting depth of neutral axis.
   }
   //update rebars
   // this.updateRebars(scaledLength)
