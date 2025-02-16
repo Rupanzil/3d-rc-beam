@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import limitingDepthNA from './rebarCalculations'
-import { depth } from 'three/webgpu'
 
 export class BeamCreator {
   constructor(scene, material, scale = 1 / 100) {
@@ -37,6 +36,36 @@ export class BeamCreator {
     console.log(length, width, height)
 
     const limNAdepth = limitingDepthNA(width, height)
+    this.maxNADepthValue = limNAdepth
+
+    // buffer geometry matrices for the limiting depth of the neutral axis
+    const limNALineVertices = [
+      new THREE.Vector3(
+        -this.beamWidth * this.scale,
+        scaledHeight - this.maxNADepthValue * this.scale,
+        scaledLength / 2
+      ),
+      new THREE.Vector3(
+        this.beamWidth * this.scale,
+        scaledHeight - this.maxNADepthValue * this.scale,
+        scaledLength / 2
+      ),
+    ]
+
+    const maxNADepthgeometry = new THREE.BufferGeometry().setFromPoints(
+      limNALineVertices
+    )
+
+    if (this.maxNADepth) {
+      this.maxNADepth.geometry.dispose()
+      this.maxNADepth.geometry = maxNADepthgeometry
+    } else {
+      this.maxNADepth = new THREE.Line(
+        maxNADepthgeometry,
+        new THREE.LineBasicMaterial({ color: 0xff0000 })
+      )
+      this.scene.add(this.maxNADepth)
+    }
 
     // edges
     const edges = new THREE.EdgesGeometry(geometry)

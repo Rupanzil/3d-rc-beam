@@ -3,7 +3,12 @@
     "three": "^0.168.0",
     "tweakpane": "^4.0.4"
   },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
   "devDependencies": {
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "vite-plugin-restart": "^0.4.1"
   }
 }
